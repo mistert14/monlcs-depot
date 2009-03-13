@@ -3,16 +3,23 @@ include("includes/secure_no_header.inc.php");
 if ($_POST) {
 	extract($_POST);
 	//test conformité liste menus
-	$liste_menu=str_replace(";;",";",$liste_menu);
-	$elems = explode(';',$liste_menu);
+	$liste_menu=str_replace("##","#",$liste_menu);
+	$elems = explode('#',$liste_menu);
 	$elems_clean=array();
 	//nettoyage
 	for ($x=0;$x<count($elems);$x++) {
-		if ($elems[$x] != null && !in_array($elems[$x],$elems_clean))
+		if ($elems[$x] != null && !in_array($elems[$x],$elems_clean)) {
+			if (eregi('perso',$elems[$x]))
+				die('Désolé le nom perso est réservé! Veuillez en choisir un autre S.V.P');
+
 			$elems_clean[] = $elems[$x];
+			}
 	}
 	$elems = $elems_clean;
 	sort($elems);
+	
+	//MODE ONGLET PERSO
+
 	//test existence nom onglet
 	$sql1 = "select * from ml_zones where nom='$onglet_name' and user='$uid'";
 	$cx1 = mysql_query($sql1) or die("ERREUR $sql1");
@@ -39,7 +46,7 @@ if ($_POST) {
 	
 	for ($x=0;$x<count($elems);$x++) {
 		$menu = $elems[$x];
-		$caption = strtolower(str_replace(" ","_",$menu));
+		$caption = noaccent(strtolower(str_replace(" ","_",$menu)));
 		$sql4 ="INSERT INTO `ml_tabs` ( `id` , `id_tab` , `user` , `caption` , `nom` )"
 			."VALUES ("
 			."NULL , '$idOnglet', '$uid', '$menu', '$caption');";
@@ -48,7 +55,7 @@ if ($_POST) {
 	}
 	
 	
-	print("Vous avez créé avec succès l'onglet $onglet_name ");
+	print("$uid a créé avec succès $onglet_name");
 
 } else die('erreur');
 	

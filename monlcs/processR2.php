@@ -1,7 +1,6 @@
 <?
 include "includes/secure_no_header.inc.php";
 
-
 ?>
 <html><head>
 <link rel="stylesheet" type="text/css" href="./Styles/admin.css" />	
@@ -9,7 +8,7 @@ include "includes/secure_no_header.inc.php";
 </head>
 <?
 
-mysql_connect($host,$user,$passDB) or die('Connexion mysql impossible!');
+mysql_connect($host,$userDB,$passDB) or die('Connexion mysql impossible!');
 mysql_select_db($DB) or die('Base inconnue!');
 
 ?>
@@ -67,7 +66,7 @@ echo "</table>";
 <?
 
 
-if (is_admin('monlcs_is_admin',$uid) == 'Y') {
+if ( ($ML_Adm == 'Y') || is_administratif($uid) ) {
 	$groups =search_groups("cn=*");
 	} else {
 	list($user,$groups)=people_get_variables($uid, true);
@@ -79,7 +78,7 @@ if (is_admin('monlcs_is_admin',$uid) == 'Y') {
 foreach($groups as $group) {
 $eq = $group['cn'];
 
-if (is_admin('monlcs_is_admin',$uid) != 'Y') {
+if ($ML_Adm != 'Y') {
 if (eregi('equipe',$eq)) {
 	$info = explode('_',$eq);
 	$info[0] = 'Classe';

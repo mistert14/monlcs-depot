@@ -2,9 +2,9 @@
 include "includes/secure_no_header.inc.php";
 if ($_POST) {
 	extract($_POST);
-	$titre= htmlspecialchars(urldecode($titre));
+		
 	if ($titre == 'null')
-		die('');
+		die("Titre nul!");
 
 	if (eregi('Note',$id)) {
 		$idRe = substr($id,12);

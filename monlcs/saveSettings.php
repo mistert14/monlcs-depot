@@ -1,14 +1,9 @@
 <?php
 include "includes/secure_no_header.inc.php";
 
-if ($_POST) {
-extract($_POST);
 
 if ($tab == 'scenario_choix') {
-	
 	die(stringForJavascript('Pas géré ici'));
-	
-
 }
 
 $ref=substr($ref,8);
@@ -27,7 +22,7 @@ if (eregi('Note',$ref)) {//if
 	
 	if ( $uid ==  $SETTER) {
 	if ($vis == 'block') {
-	$sql3 =" UPDATE `monlcs_db`.`ml_notes` SET x='$x', y='$y', w='$w', h='$h'  WHERE id='$ref' ";
+	$sql3 =" UPDATE `monlcs_db`.`ml_notes` SET x='$x', y='$y',  z='$z', w='$w', h='$h', min='$min'  WHERE id='$ref' ";
 	$c3 = mysql_query($sql3) or die("ERR $sql3");
 	}
 	else {
@@ -36,11 +31,7 @@ if (eregi('Note',$ref)) {//if
 	$c7 = mysql_query($sq7) or die("ERR $sq7");
 	
 	if  ( mysql_num_rows($c7) == 0 ) {
-<<<<<<< .mine
 	$sql3 =" DELETE FROM `monlcs_db`.`ml_notes`  WHERE id='$ref' and menu='$tab'";
-=======
-	$sql3 =" DELETE FROM `monlcs_db`.`ml_notes`  WHERE id='$ref' and menu='$tab';";
->>>>>>> .r1768
 	$c3 = mysql_query($sql3) or die("ERR $sql3");
 	}
 	}
@@ -71,7 +62,7 @@ if (eregi('Note',$ref)) {//if
 		}
 		else {
 			if ($vis == 'block')
-				$sq = "UPDATE `monlcs_db`.`ml_ressourcesAffect` SET `x` = '".$x."', `y` = '".$y."',`w` = '".$w."',`h` = '".$h."' WHERE `id` ='".$idAffect."' ;";
+				$sq = "UPDATE `monlcs_db`.`ml_ressourcesAffect` SET `x` = '".$x."', `y` = '".$y."', `z` = '".$z."',`w` = '".$w."',`h` = '".$h."', `min` = '".$min."' WHERE `id` ='".$idAffect."' ;";
 			if ($vis == 'none')
 				$sq = "DELETE FROM `monlcs_db`.`ml_ressourcesAffect` WHERE `id` ='".$idAffect."' ;";
 			$c = mysql_query($sq) or die("ERR $sq");
@@ -84,7 +75,7 @@ if (eregi('Note',$ref)) {//if
 	$c = mysql_query($sql) or die("ERR $sql"); 
 	if (mysql_num_rows($c) != 0 ) {//if2
 	if ($vis == 'block') {
-		$sq = "UPDATE `monlcs_db`.`ml_geometry` SET `x` = '".$x."', `y` = '".$y."',`w` = '".$w."',`h` = '".$h."' , `min` = '".$min."' WHERE `id_ressource` ='".$ref."' and id_menu='$id_menu' and user='$uid' LIMIT 1 ;";
+		$sq = "UPDATE `monlcs_db`.`ml_geometry` SET `x` = '".$x."', `y` = '".$y."', `z` = '".$z."',`w` = '".$w."',`h` = '".$h."' , `min` = '".$min."' WHERE `id_ressource` ='".$ref."' and id_menu='$id_menu' and user='$uid' LIMIT 1 ;";
 	} else {
 		$sq = "DELETE FROM `monlcs_db`.`ml_geometry` WHERE `id_ressource` ='".$ref."' and id_menu='$id_menu' and user='$uid' LIMIT 1 ;";
 		}
@@ -99,19 +90,20 @@ if (eregi('Note',$ref)) {//if
 	`user` ,
 	`x` ,
 	`y` ,
+	`z` ,
 	`w` ,
 	`h` ,
 	`min`
 	
 	)
 	VALUES (
-	NULL , '$id_menu', '$ref', '$uid', '$x', '$y', '$w', '$h', '$min'
+	NULL , '$id_menu', '$ref', '$uid', '$x', '$y','$z', '$w', '$h', '$min'
 	);";
 	print(stringForJavascript($sql));
 	$curseur=mysql_query($sql) or die('<ul><li>requete invalide</li></ul>');
     } 
 	}//else
-	}//if get
+	
 
 
 

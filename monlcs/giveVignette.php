@@ -34,7 +34,7 @@ if ($_POST) {
 	    } 
 
 		if (mysql_num_rows($curseur) !=0) {
-			mysql_connect($host,$user,$passDB) or die('Connexion mysql impossible!');
+			mysql_connect($host,$userDB,$passDB) or die('Connexion mysql impossible!');
 			$sqlA = "select * from ml_geometry where id_menu='$id_tab' and user = '$uid' and id_ressource='$ref' ;";
 			$cA = mysql_query($sqlA) or die("ERR $sqlA");
 			

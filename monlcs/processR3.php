@@ -33,66 +33,38 @@ if (eregi('perso',$tab)) {
 		}
 }
 
-    $listeRess = array();
-    $sql222 =  "SELECT * from `monlcs_db`.`ml_notes` WHERE setter='$uid'  and menu <> 'perso4' order by titre ;";
-    $c222 = mysql_query($sql222) or die ("ERR $sql222");
-    
-    if (mysql_num_rows($c222) != 0) {
-	
-	for ($x=0;$x<mysql_num_rows($c222);$x++) {
-		$R = mysql_fetch_object($c222);
-		if($R->msg != '')
-    		$listeRess[] = "N#".$R->titre."#NOTE".$R->id;
-}
-
-}
 
 
-
-
-    $sql22 =  "SELECT * from `monlcs_db`.`ml_ressources` WHERE (owner='$uid' OR statut='public') order by titre ;";
+    if ($ML_Adm == 'Y' ) 
+	$sql22 = "SELECT * from `monlcs_db`.`ml_ressources` where owner != 'mrT' ORDER by titre;";
+    else
+	$sql22 =  "SELECT * from `monlcs_db`.`ml_ressources` WHERE (owner='$uid' OR statut='public' OR owner = 'all_profs' AND owner != 'mrT') order by titre ;";
     $c22 = mysql_query($sql22) or die ("ERR $sql22");
 
     if (mysql_num_rows($c22) != 0) {
+        $listeRess = "<select id=url name=url>";
         for ($x=0;$x<mysql_num_rows($c22);$x++) {
             $R = mysql_fetch_object($c22);
             $url2 = $R->url;
            
             if (eregi('RSS',$R->RSS_template))
-                $brique = 'F#';
+                $brique = ' [RSS] ';
             else
-                $brique = 'R#';
+                $brique = '';
             if (($R->url != ''))
-                $listeRess[]= $brique.$R->titre."#".$R->id;
+                $listeRess .= "<option value=".$R->id.">".$brique.$R->titre."</option>";
            
 
         }
+    $listeRess .="</select>";
     }
 
-    
-    $liste_Ress = "<select id=url name=url>";
-	for($z=0;$z<count($listeRess);$z++){
-		$infos = explode('#',$listeRess[$z]);
-		$type = $infos[0];
-		$tit = $infos[1];
-                $_id = $infos[2];		
-		if ($type == 'R')
-			$brique=" ";
-		if ($type == 'F')
-			$brique=" [RSS] ";
-		if ($type == 'N')
-			$brique=" [NOTE] ";
-                $liste_Ress.= "<option value=\"$_id\">$brique$tit</option>";
-	}
-    $liste_Ress .="</select>";
-
-
-
+ 
 echo "<div id=bcg>";
-echo "<div id=divR><B>Ressource:</B><BR />".
-        "<div id=ress>$liste_Ress<BR /></div><div id=img onclick=javascript:viewUrl();>$view_img</div>";
+echo "<div id=divR><B>Ressource:</B><BR />
+        <div id=ress>$listeRess<BR /></div><div id=img onclick=javascript:viewUrl();>$view_img</div>";
 echo "</div>";
-//echo "<div id=divN><div id=img onclick=javascript:viewNote();>$view_img</div><B>Note:</B><BR />$listeNote<BR /></div>";
+echo "<div id=divN><div id=img onclick=javascript:viewNote();>$view_img</div><B>Note:</B><BR />$listeNote<BR /></div>";
 
 
 echo "<BR /><BR /><BR /><div class=div1><B>Menu actif:&nbsp; </B></div><div class=div2> $liste </div>";
@@ -101,7 +73,14 @@ echo "<div class=div1><B>Matiere: </B></div><div class=div2> <select id=\"matier
 
 
 echo "<option value=-1>-</option>";
-$matieres =search_groups("cn=mati*");
+if (($ML_Adm == 'Y') ||  is_administratif($uid))
+	$matieres = search_groups("cn=mati*");
+else {	
+	$matieres = matieres_prof($uid);
+     }
+
+
+
 foreach($matieres as $mat) {
 $eq = $mat['cn'];
 echo "<option value='".$eq. "' class='group'>$eq</option>";
@@ -120,7 +99,7 @@ echo "</div>";
 <?
 
 
-if (is_admin('monlcs_is_admin',$uid) == 'Y') {
+if ( ($ML_Adm == 'Y') || is_administratif($uid) ) {
     $groups = search_groups("cn=*");
     	$gr = array();
 			foreach($groups as $group) {
@@ -150,7 +129,7 @@ if (is_admin('monlcs_is_admin',$uid) == 'Y') {
 foreach($groups as $group) {
 $eq = $group['cn'];
 
-if (is_admin('monlcs_is_admin',$uid) != 'Y') {
+if ( ($ML_Adm != 'Y') && !is_administratif($uid) ) {
 if (eregi('equipe',$eq)) {
     $info = explode('_',$eq);
     $info[0] = 'Classe';
@@ -169,10 +148,15 @@ echo "<option value='".$eq. "' class='group'>$eq</option>";
 </select>
 <p>Choissisez le(s) groupe(s) cible(s)</p>
 </div>
-</form>
+
+
 <!-- Ajouté le 30 juin par MrT -->
-<div id="publication_acad"><input type="checkbox" id="acad_pub" name="acad_pub" />Publier sur le d&eacute;pot <BR />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;acad&eacute;mique.</div>
+<!-- <div id="publication_acad"><input type="checkbox" id="acad_pub" name="acad_pub" />Publier sur le d&eacute;pot <BR />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;acad&eacute;mique.</div> -->
 <!-- Fin ajout -->
+
+
+
+</form>
 
 <div id="bouton-sauve">
     <a class="go" href="#" onclick="javascript:savePropose();">Enregistrer</a>
@@ -184,3 +168,4 @@ echo "<option value='".$eq. "' class='group'>$eq</option>";
 <?
 }//if get
 ?> 
+

@@ -1,58 +1,67 @@
 <?
-include "includes/secure_no_header.inc.php";
+	include "includes/secure_no_header.inc.php";
 
-if($_POST) {
-extract($_POST);
-$titre = htmlspecialchars(urldecode($titre));
-#die("$titre");
+	if($_POST) {
+		extract($_POST);
+		$titre = htmlspecialchars(urldecode($titre));
+		
 
-if (eregi('Cmd',$idR)) {
-		die('Cmd pas géré ici !');
-		$idR = substr($idR,4);
+		if (eregi('Cmd',$idR)) {
+			die('Cmd pas géré ici !');
+			$idR = substr($idR,4);
 		}
 
 
-//alimenter ml_scenarios
+		//alimenter ml_scenarios
 		$idR = substr($idR,8);
-
-
+		
 		if (eregi('Note',$idR)) {
-		$type = 'note';
-		$idR = substr($idR,4);
-		}
-		else
-		{
-		$type ='ressource';
+			$type = 'note';
+			$idR = substr($idR,4);
+		} else {
+			$type ='ressource';
 		}	
 	
-		$sq ="select * from monlcs_db.ml_scenarios where id_ressource='$idR' and titre='$titre' and matiere='$matiere' and cible='$cible' and setter='$uid';";
-		$c = mysql_query($sq) or die("ERR $sq");
-		if (mysql_num_rows($c) !=0 ) {
-		//update	
-		} else {
 		
-			$sql =" INSERT INTO `monlcs_db`.`ml_scenarios` (
-			`id` ,
-			`setter` ,
-			`titre` ,
-			`id_ressource` ,
-			`cible` ,
-			`type` ,
-			`matiere` ,
-			`x` ,
-			`y` ,
-			`w` ,
-			`h`
-			)
-			VALUES (
-			NULL , '$uid','$titre', '$idR', '$cible','$type', '$matiere','$x','$y','$w','$h'
-			);";
+		$cible[0]='';
+		$cible[strlen($cible)-1]='';
+		$arr_cible = explode('#',$cible);
+		
+		
+		$sq ="select * from monlcs_db.ml_scenarios where id_ressource='$idR' and id_scen='$id_scen' and setter='$uid';";
+		$c = mysql_query($sq) or die("ERR $sq");
+		if (mysql_num_rows($c) == 0 ) {
+			foreach($arr_cible as $cible) {
+				$cible = trim($cible);
+				if ($cible != '') {
+					$sql =" INSERT INTO `monlcs_db`.`ml_scenarios` (
+					`id` ,
+					`id_scen` ,
+					`setter` ,
+					`titre` ,
+					`id_ressource` ,
+					`cible` ,
+					`type` ,
+					`matiere` ,
+					`x` ,
+					`y` ,
+					`z` ,
+					`w` ,
+					`h`,
+					`min`,
+					`descr`
+					)
+					VALUES (
+					NULL ,'$id_scen','$uid','$titre', '$idR', '$cible','$type', '$matiere','$x','$y','$z','$w','$h','$min','$descr'
+					);";
 
-		$cIns = mysql_query($sql) or die("ERR $sql");
-		echo $sql;
-
-		}
-	}//if get
+				$cIns = mysql_query($sql) or die("ERR $sql");
+				$msg .= " <BR />Success $sql";
+				}
+			}//foreach
+		}//if
+		die($msg);
+	}//if post
 
 
 ?>

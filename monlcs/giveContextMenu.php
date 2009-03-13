@@ -2,72 +2,76 @@
 
 include "includes/secure_no_header.inc.php";
 
+//mysql_connect($host,$user,$passDB) or die('Connexion mysql impossible!');
+//mysql_select_db($DB) or die('Base inconnue!');
+
 if ($_POST)
 	extract($_POST);
 
-mysql_connect($host,$user,$passDB) or die('Connexion mysql impossible!');
-mysql_select_db($DB) or die('Base inconnue!');
+
+
+$content2 = "<div class=menuitems title=$id><B> Menu</B></div>";
+$content2 .="<HR />";
+
 
 if ($id == 'actu') {
 	if ( $ML_Adm != 'Y' )
 		die('Aucune action possible ...');
-}
+	}
 
 if ($id == 'scenario_choix') {
 	if (is_eleve($uid))
 		die('Aucune action possible ...');
-	
 }
 
-
-$content2 = "<div class=menuitems title=$id><B> Menu</B></div>";
-
-$content2 .="<HR />";
 
 
 if ($id == 'rss') {
-$content2 .="<div onclick=javascript:rssSave(); class=menuitems title=Sauver_les_flux>Enregistrer le bureau</div>";
+if ($mode == 'user')
+	$content2 .="<div onclick=javascript:rssSave(); class=menuitems title=Sauver_les_flux>Enregistrer les modifications</div>";
 $content2 .="<div onclick=javascript:giveRessources('$id'); class=menuitems title=Ressources>Ressources</div>";
 
 }
-if (!eregi('perso',$id) && !eregi('rss',$id) || $id == 'perso4' ) {
 
-	$content2 .="<div onclick=javascript:desktopSave(); class=menuitems title=Sauver_le_bureau>Enregistrer le bureau</div>";
-	if (( $ML_Adm == 'Y' ) && ($id != 'rss'))
+//if ($id == 'import_acad') {
+//	$content2 .="<div onclick=javascript:fetchScen(); class=menuitems title=Importer_ce_sc&#233;nario>Importer ce sc&#233;nario.</div>";
+//	die(stringForJavascript($content2));
+
+//}
+
+if (is_scenarii($id)) {
+	$content2 .="<div onclick=javascript:showTuto(); class=menuitems title=Tutoriels>Tutoriels</div>";
+}
+
+if (!eregi('perso',$id) && !eregi('rss',$id) || is_scenarii($id)) {
+
+	if ($mode == 'user')
+		$content2 .="<div onclick=javascript:desktopSave(); class=menuitems title=Sauver_le_bureau>Enregistrer les modifications </div>";
+	if ( ($ML_Adm == 'Y') && ($id != 'rss') && (!is_perso_tab($id)) && !is_scenarii($id) )
 		$content2 .="<div onclick=javascript:defaultSave(); class=menuitems title=Par_défaut>Proposer par défaut</div>";
+	if ( is_administratif($uid)  && ($id == 'vs') )
+		$content2 .="<div onclick=javascript:defaultSave(); class=menuitems title=Par_défaut>Proposer par défaut</div>";
+
 	$content2 .="<div onclick=javascript:giveRessources('$id'); class=menuitems title=Ressources>Ressources</div>";
 
-	if ($ML_Adm == 'Y')
+
+	if (!is_eleve($uid) && ( ($id == 'bureau') || (is_scenarii($id)) || ($id == 'vs' ) || ($id == 'scenario_choix') || is_perso_tab($id) || ( $ML_Adm == "Y" ) ))
 		$content2 .="<div onclick=ajoutNote('$id'); class=menuitems title=Ajout_note>Ajouter une note</div>";
-       	else {
-
-	if (!is_eleve($uid) && ( ($id == 'bureau') || ($id == 'perso4') || ($id == 'vs' ) || ($id == 'scenario_choix') ) )
-		$content2 .="<div onclick=ajoutNote('$id'); class=menuitems title=Ajout_note>Ajouter une note</div>";
+}
 
 
+if (is_scenarii($id)) {
+	$content2 .="<div onclick=javascript:scenario('$id'); class=menuitems title=Sc&eacute;nario>Cr&eacute;er un nouveau sc&eacute;nario</div>";
+#########################################################################################################################################################################
+# Ajout pour Publication ACAD
 
-//ajout note dans espaces perso
-	
-
-	$sql2 =  "SELECT * from `ml_tabs` WHERE nom='$id' and (user='$uid') LIMIT 1;";
-	$curseur2=mysql_query($sql2) or die("$sql2 requete invalide");
-	if ( mysql_num_rows($curseur2) != 0)
-		$content2 .="<div onclick=ajoutNote('$id'); class=menuitems title=Ajout_note>Ajouter une note</div>";
+	//$content2 .="<div onclick=javascript:scen_acad_pub(); class=menuitems title=Publication&nbsp;acad&eacute;mique>Publication&nbsp;acad&eacute;mique</div>";
+#########################################################################################################################################################################
 	}
-}
-if (eregi('perso',$id)) {
-if ($id == 'perso4' ) {
-	$content2 .="<div onclick=javascript:scenario('$id'); class=menuitems title=Sc&eacute;nario>Publier un sc&eacute;nario</div>";
-	} 
+	 
+if (($ML_Adm =='Y') && ($id != 'scenario_choix') && (!is_perso_tab($id)) && !eregi('perso',$id))
+	$content2 .="<div onclick=javascript:publish('$id'); class=menuitems title=\"Figer\">Figer des ressources !</div>";
 	
-}
-
-		if (($ML_Adm =='Y') && ($id != 'scenario_choix') )
-			$content2 .="<div onclick=javascript:publish('$id'); class=menuitems title=\"Figer\">Figer des ressources</div>";
-	
-
-
-
 
 print(stringForJavascript($content2));
 ?>

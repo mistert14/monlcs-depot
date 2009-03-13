@@ -1,14 +1,15 @@
 <?php
 
 	include "includes/secure_no_header.inc.php";
-	if (is_eleve($uid))
-		print(stringForJavascript("eleve"));
-	else {
-		if ($ML_Adm == 'Y') {
-			print(stringForJavascript("admin"));
+	if ($ML_Adm == 'Y') {
+			die(stringForJavascript("admin"));
  		} else { 
-       			print(stringForJavascript("prof"));
+			if (is_administratif($uid))
+				die(stringForJavascript("administratif"));
+			if (is_eleve($uid))
+				die(stringForJavascript("eleve"));
+			else 
+				die(stringForJavascript("prof"));
    		}
-	}
 
 ?>

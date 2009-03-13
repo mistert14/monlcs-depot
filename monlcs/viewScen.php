@@ -1,21 +1,26 @@
 <?php
 include "includes/secure_no_header.inc.php";
 extract($_POST);
-$info = explode('+',$titre);
-$titre = implode(' ',$info);
+
+
 $content = "document.getElementById('content').style.display='none';";
 
-$sql = "select * from monlcs_db.ml_scenarios where titre='$titre' and  matiere='$matiere' and setter='$auteur';";
+$sql = "select * from monlcs_db.ml_scenarios where id_scen ='$id_scen';";
 //$content .= $sql;
+
 $c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
 
 	for ($x=0;$x<mysql_num_rows($c2);$x++) {
 		$idR = mysql_result($c2,$x,'id_ressource');
 		$posx = mysql_result($c2,$x,'x');
 		$posy = mysql_result($c2,$x,'y');
+		$zI = mysql_result($c2,$x,'z');
+		$min = mysql_result($c2,$x,'min');
 		$width = mysql_result($c2,$x,'w');
 		$height = mysql_result($c2,$x,'h');
 		$type = mysql_result($c2,$x,'type');
+		$auteur = mysql_result($c2,$x,'setter');
+
 		if ($type == 'ressource') {
 		//chercher url ...
 		$sql3 = "select * from ml_ressources where id=$idR;";
@@ -27,8 +32,8 @@ $c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
 				$url='giveCleanFlash.php?url='.$url;
 			$url_vignette = mysql_result($c3,0,'url_vignette');
 
-			$owner = mysql_result($c3,0,'owner');
-			$titre = mysql_result($c3,0,'titre');
+			$owner = trim(mysql_result($c3,0,'owner'));
+			$titre = stringForJavascript(mysql_result($c3,0,'titre'));
 			$tp_rss = mysql_result($c3,0,'RSS_template');
 			
 			
@@ -60,28 +65,63 @@ $c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
 		$content .= "'width=$width"."px".",height=$height"."px".",left=$posx"."px".",top=$posy"."px".",";
 		$content .= "resize=1,scrolling=1,center=0'";
 		$content .= ");";
-		if ($uid != $auteur)
-			$content .= "inhibit_close(ajaxWind$idR);";
+		$content .= "inhibit_close(ajaxWind$idR);";
+		
+		if ($uid == trim($owner)) 
+			$content .= "showPen(ajaxWind$idR);";
+		if ($uid == trim($auteur))
+			$content .= "desinhibit_close(ajaxWind$idR);";
+		
+		
+		if ( $min == 'Y' ) {
+			$content .= "mini(ajaxWind$idR);";
+			$content .= "ajaxWind$idR.style.zIndex=90;";
+			$content .= "ajaxWind$idR.zIndexvalue=90;";
+
+		} else {
+			$content .= "ajaxWind$idR.style.zIndex=$zI;";
+			$content .= "ajaxWind$idR.zIndexvalue=$zI;";
 		}
+		}		
+
+		
 				
 		}// if ressource
 		
 		if ($type == 'note') {
-		$sql3 = "select * from monlcs_db.ml_notes where id='$idR'";
-		$c3 = mysql_query($sql3) or die(stringForJavascript("ERR $sql3"));
-		if ( mysql_num_rows($c3) != 0 ) {
-		$leTit = mysql_result($c3,0,'titre');
-		$m = mysql_result($c3,0,'msg');
-		$m = addCslashes($m,chr(39));
+			$sql3 = "select * from monlcs_db.ml_notes where id='$idR'";
+			$c3 = mysql_query($sql3) or die(stringForJavascript("ERR $sql3"));
+			if ( mysql_num_rows($c3) != 0 ) {
+				$leTit = stringForJavascript(mysql_result($c3,0,'titre'));
+				$setter = trim(mysql_result($c3,0,'setter'));
+				$m = mysql_result($c3,0,'msg');
+				$m = stripCslashes($m);
+				$m = addCslashes($m,chr(39));
 
-		$content .= "var ajaxWindNote$idR=dhtmlwindow.open('ajaxWindNote$idR','inline','$m','$leTit',";
-		$content .= "'width=$width"."px".",height=$height"."px".",left=$posx"."px".",top=$posy"."px".",";
-		$content .= "resize=1,scrolling=1,center=0'";
-		$content .= ");";
-		if ($uid != $auteur)
-			$content .= "inhibit_close(ajaxWindNote$idR);";
+				$content .= "var ajaxWindNote$idR=dhtmlwindow.open('ajaxWindNote$idR','inline','$m','$leTit',";
+				$content .= "'width=$width"."px".",height=$height"."px".",left=$posx"."px".",top=$posy"."px".",";
+				$content .= "resize=1,scrolling=1,center=0'";
+				$content .= ");";
+				$content .= "inhibit_close(ajaxWindNote$idR);";
 
-		}
+				
+				if ($uid == trim($auteur)) {
+					$content .= "desinhibit_close(ajaxWindNote$idR);";
+					$content .= "showPen(ajaxWindNote$idR);";
+				}
+		
+				if ( $min == 'Y' ) {
+					$content .= "mini(ajaxWindNote$idR);";
+					$content .= "ajaxWindNote$idR.style.zIndex=90;";
+					$content .= "ajaxWindNote$idR.zIndexvalue=90;";
+
+				} else {
+					$content .= "ajaxWindNote$idR.style.zIndex=$zI;";
+					$content .= "ajaxWindNote$idR.zIndexvalue=$zI;";
+				}
+
+				
+		     	}
 		
 		}//if note
 
@@ -91,15 +131,5 @@ $c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
 	
 	print stringForJavascript($content);
 	
-	
-	
-
-
-
-
-
-
-
-
 
 ?>
