@@ -2,7 +2,7 @@
 include "includes/secure_no_header.inc.php"
 ?>
 <BODY>
-<div id = "scen-container">
+<center><div id = "scen-container">
 <form method="post" action="processScen.php" onsubmit="multipleSelectOnSubmit()">
 <? 
 if ($_POST) {
@@ -11,23 +11,33 @@ extract($_POST);
 $fen = $fen;
 $ress = explode(',',$fen);
 echo "<div id=scen-contenu>";
-echo "<div id=scen-titre>Sauvegarde du scenario</div>";
-echo "<div class=scen-nom>Titre:<input id=titre name=titre style=\"width: 100px;\" /></div>";
-echo "<div class=scen-mat>Matiere:<select id=\"matiere\" name=\"matiere\">";
-$matieres =search_groups("cn=mati*");
+echo "<table><tr><td colspan=2><div id=scen-titre>Sauvegarde du scenario</div></td></tr>";
+echo "<tr><td><div class=scen-nom>Titre:</div></td><td><input class=long id=titre name=titre /></td></tr>";
+echo "<tr><td><div class=scen-mat>Matiere:</div></td><td><select class=long id=\"matiere\" name=\"matiere\">";
+
+if ( ($ML_Adm == 'Y')  ||  is_administratif($uid))
+	$matieres = search_groups("cn=mati*");
+else {	
+	$matieres = matieres_prof($uid);
+     }
+
+
+
 foreach($matieres as $mat) {
 $eq = $mat['cn'];
 echo "<option value='".$eq. "' class='group'>$eq</option>";
 }
-echo "</select></div>";
-echo "</div>";
+echo "</select></td></tr>";
+echo "<tr><td><div class=scen-nom>Descr.:</div></td><td><input class=long id=\"scen_descr\" name=\"scen_descr\"></td></tr></table>";
+
+echo "</center></div>";
 ?>
-<div class="scen-ldapBOX">
+<center><div class="scen-ldapBOX">
 	<select multiple name="fromBox" id="fromBox">
 <?
 
 
-if (is_admin('monlcs_is_admin',$uid) == 'Y') {
+if ( ($ML_Adm == 'Y') || is_administratif($uid)) {
 	$groups =search_groups("cn=*");
 	$gr = array();
 			foreach($groups as $group) {
@@ -54,7 +64,7 @@ if (is_admin('monlcs_is_admin',$uid) == 'Y') {
 foreach($groups as $group) {
 $eq = $group['cn'];
 
-if (is_admin('monlcs_is_admin',$uid) != 'Y') {
+if ( ($ML_Adm != 'Y') && !is_administratif($uid)) {
 if (eregi('equipe',$eq)) {
 	$info = explode('_',$eq);
 	$info[0] = 'Classe';
@@ -80,7 +90,7 @@ createMovableOptions("fromBox","toBox",300,200,'Groupes disponibles','Groupes se
 </script>
 
 <p>Choissisez le(s) groupe(s) cible(s)</p>
-</div>
+</center></div>
 
 		
 <div id="bouton-sauve-scen">
@@ -89,6 +99,7 @@ createMovableOptions("fromBox","toBox",300,200,'Groupes disponibles','Groupes se
 <?
 }//if get
 ?>
+
 </div>
 </body>
 </html>

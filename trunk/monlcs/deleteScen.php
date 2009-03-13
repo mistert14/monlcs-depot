@@ -1,27 +1,26 @@
 <?php
 
-include "includes/secure_no_header.inc.php";
+	include "includes/secure_no_header.inc.php";
 
-extract($_POST);
-$info = explode('+',$titre);
-$titre = implode(' ',$info);
+	extract($_POST);
+	
+	if ($ML_Adm == "Y")
+		$sql = "SELECT id_ressource FROM monlcs_db.ml_scenarios where id_scen='$id_scen' ;";
+	else
+		$sql = "SELECT id_ressource FROM monlcs_db.ml_scenarios where id_scen='$id_scen' and setter='$uid' ;";
+	
+	$c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
+	echo $sql;
 
-$sql = "SELECT id_ressource FROM monlcs_db.ml_scenarios where titre='$titre' and  matiere='$matiere' and setter='$auteur' and type='note';";
-$c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
-echo $sql;
+	if (mysql_num_rows($c2) == 0 )
+		die('Pb de droits');
 
-while ($R = mysql_fetch_object($c2)) {
-$idNoteEff = $R->id_ressource;
-$sql2 = "DELETE FROM monlcs_db.ml_notes where id='$idNoteEff' and  menu='perso3';";
-echo $sql2;
-$c3=mysql_query($sql2) or die(stringForJavascript("ERR $sql2"));
-}
+	if ($ML_Adm == "Y")
+		$sql = "DELETE FROM monlcs_db.ml_scenarios where id_scen='$id_scen';";
+	else
+		$sql = "DELETE FROM monlcs_db.ml_scenarios where id_scen='$id_scen' and setter='$uid';";
 
-
-
-$sql = "DELETE FROM monlcs_db.ml_scenarios where titre='$titre' and  matiere='$matiere' and setter='$auteur';";
-$c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
-echo $sql;
-
+	$c2=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
+	echo $sql;
 
 ?>

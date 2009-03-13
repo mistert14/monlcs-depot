@@ -5,38 +5,40 @@ if ($_POST) {
 	extract($_POST);
 }
 
-
-$sql = "select * from monlcs_db.ml_tabs where nom='$id' and user='$uid'";
-$c = mysql_query($sql) or die ("ERR $sql");
-if (mysql_num_rows($c) != 0) {
-		$content = 'ok';
-		die($content);
-	}
+if ($ML_Adm == 'Y')
+	die('ok');
 
 
 if ($id == 'scenario_choix') {
-	if ($setter != $uid)
-		die ('ko');
-	else die('ok');
-	
-	}
+	if (is_eleve($uid))
+		die('ko');
+	if ($id_scen == -1)
+		die('ok');
 
-if ($id == 'perso4')
+	$sql = "select * from monlcs_db.ml_scenarios where `setter`='$uid' and `id_scen`='$id_scen';";
+	$c = mysql_query($sql) or die("ERREUR $sql");
+	if (mysql_num_rows($c) == 0)
+		die('ko');
+	else
+		die('ok');
+}
+
+
+if ( is_administratif($uid)  && ($id == 'vs') )
 	die(stringForJavascript('ok'));
 
 if ($id == 'bureau')
 	die(stringForJavascript('ok'));
 
-if ($ml_Adm =='y')
-	$content = 'ok';
-else
-	$content = 'ko';
+if (is_perso_tab($id))
+	die(stringForJavascript('ok'));
+
+$content = 'ko';
 
 $sql = "select * from monlcs_db.ml_notes where id='$note' and setter='$uid'";
 $c = mysql_query($sql) or die ("ERR $sql");
 if (mysql_num_rows($c) != 0)
 	$content = 'ok';
-
 
 
 print(stringForJavascript($content));

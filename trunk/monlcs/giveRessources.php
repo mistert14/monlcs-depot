@@ -7,7 +7,7 @@ else
 
 $content .= "<table id=cmd>";
 $content .="<tr>"
-."<td colspan=4 class=grise>Action</td>"
+."<td colspan=5 class=grise>Action</td>"
 ."<td class=grise>Titre</td>"
 //."<td class=grise>Url</td>"
 ."</tr>";
@@ -25,28 +25,43 @@ if ( mysql_num_rows($curseur) != 0 ) {
 $ListeRess = array();
 $ListeRss = array();
 
-$sql = "SELECT * from `monlcs_db`.`ml_ressources` where owner = '$uid' OR statut='public' ORDER by titre;";
-$curseur=mysql_query($sql) or die("<ul><li>$sql requete invalide</li></ul>");
+	if ($ML_Adm == 'Y' ) 
+		$sql = "SELECT * from `monlcs_db`.`ml_ressources` where owner != 'mrT' ORDER by titre;";
+	else {
+		if (is_eleve($uid))
+			$sql = "SELECT * from `monlcs_db`.`ml_ressources` where statut='public' ORDER by titre;";
+		else
+			$sql = "SELECT * from `monlcs_db`.`ml_ressources` where owner = '$uid' OR owner='all_profs' OR statut='public' AND owner != 'mrT'  ORDER by titre;";
+	    }
+	
+	$curseur=mysql_query($sql) or die("<ul><li>$sql requete invalide</li></ul>");
 
-for ($x=0; $x<mysql_num_rows($curseur);$x++) {
-$Titre = mysql_result($curseur,$x,'titre');
-$Ress = mysql_result($curseur,$x,'id');
-$Type = mysql_result($curseur,$x,'RSS_template');
+	for ($x=0; $x<mysql_num_rows($curseur);$x++) {
+		$Titre = mysql_result($curseur,$x,'titre');
+		$Ress = mysql_result($curseur,$x,'id');
+		$Type = mysql_result($curseur,$x,'RSS_template');
+		$Url = mysql_result($curseur,$x,'url');
+		$User = mysql_result($curseur,$x,'owner');
 
-if ($Type == 'null' )
-	$ListeRess[] = $Titre."#".$Ress;
-else
-	$ListeRss[] = $Titre."#".$Ress;
-}
 
-//ressources proposees pour scenarios
+		$pattern = $baseurl.'/~';
+		if ( (!eregi($pattern,$Url) && ($User != $uid)) || ($User == $uid) ) {
+			if ($Type == 'null' )
+				$ListeRess[] = $Titre."#".$Ress;
+			else
+				$ListeRss[] = $Titre."#".$Ress;
+		}
+	}
 
-	if ( ($tab == 'scenario_choix') || ($tab == 'perso4') ) {
+	//ressources proposees pour scenarios
+
+	if ( ($tab == 'scenario_choix') || (is_scenarii($tab)) ) {
 		
-		$groupes = give_groupes();
+		$groupes = give_groupes_uid($uid);
+		
 			foreach($groupes as $gp) {
 			
-			$sql = "select * from ml_ressourcesProposees where cible = '$gp' ;";
+			$sql = "select * from ml_ressourcesProposees where cible = '".$gp['cn']."' ;";
 			$c =mysql_query($sql) or die("Erreur $sql !");
 			for ($x=0; $x<mysql_num_rows($c);$x++) {
 				$r_id = mysql_result($c,$x,'id_ressource');
@@ -97,6 +112,7 @@ $dejala= mysql_num_rows($cxDejaAff);
 
 if ( ($tab == 'rss') && ($dejala == 0) || ($tab != 'rss') ) { 
 $content.="<tr>";
+$content .="<td><div id=helpR".$idListe." class=helpR $help_img</div></td>";
 
 if (( $R->owner == $uid )  && (Ressource_Libre($R->id) == '') || ($ML_Adm == 'Y') ) {
 		$content.= "<td ><div onclick=deleteRessources(".$R->id.");>$delete_img</div></td>";
@@ -128,8 +144,13 @@ else
 	$content.="<div onclick=viewRessource(".$R->id.");>$view_img</div>";
 
 
-$content .= "</td>"
-."<td id=titre_ajaxWind".$R->id.">$R->titre&nbsp;";
+$content .= "</td>";
+
+
+
+
+
+$content .="<td id=titre_ajaxWind".$R->id.">$R->titre&nbsp;";
 if ($R->owner == $uid)
 	$content .="<div onclick=renameRessources('ajaxWind".$R->id."');>$rename_img</div>";
 

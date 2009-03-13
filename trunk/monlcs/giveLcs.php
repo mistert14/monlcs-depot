@@ -42,7 +42,7 @@ $content .= "</table>";
 
 if ( $ML_Adm == 'Y' ) {
 	
-	$cx = mysql_connect($host,$user,$passDB) or die('ERREUR ACCES SQL');
+	$cx = mysql_connect($host,$userDB,$passDB) or die('ERREUR ACCES SQL');
 	mysql_select_db($DB) or die('choix base ko');
 
 	$sqlRessImp = "SELECT * FROM ml_ressourcesAffect WHERE id_menu='$idTab'";

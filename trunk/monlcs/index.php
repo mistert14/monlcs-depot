@@ -1,5 +1,6 @@
 <?
  include "includes/secure_no_header.inc.php";
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -16,6 +17,7 @@
 
 <script type="text/javascript">
 var floating_window_skin = 1;
+
 </script>
 <script type="text/javascript" src="./lib/prototype.js"></script>
 <script type="text/javascript" src="lib/ajax.js"></script>
@@ -27,7 +29,15 @@ var floating_window_skin = 1;
 <script type="text/javascript" src="./fckeditor/fckeditor.js"></script>
 <script type="text/javascript" src="./lib/floating_window_with_tabs.js"></script>
 <script type="text/javascript" src="./lib/lazierLoad.js"></script>
+<script type="text/javascript" src="./lib/acad_import.php"></script>
 <script type="text/javascript" src="./lib/mon_lcs.js"></script>
+<script type="text/javascript" src="./lib/acad_export.js"></script>
+
+<script type="text/javascript">
+var mode='user';
+var user='<? echo $uid; ?>';
+</script>
+
 
 <title>Mon LCS</title>
 
@@ -40,8 +50,11 @@ var floating_window_skin = 1;
 <div id="ContentAddingOnglet"></div>
 <div id="addOnglet"></div>
 <div id="load"></div>
-<div id="content">Patientez SVP ;)</div>
+<div id="content"></div>
+<div id="acad"></div>
+<div id="spinner"></div>
 <div id="ressources"></div>
+<div id="ressourcesAcad"></div>
 <div id="stats"></div>
 <div id="mainMenu"></div>
 <div id="submenu"></div>
@@ -65,10 +78,14 @@ var floating_window_skin = 1;
 <div id="main">
 </div>		
 
+
+<div id="gest_tab"></div>	
 <div id="SH_frame" onclick="javascript:SH();"></div>
 <div id="cDv"></div>
 <div id="virtualMenu"></div>
-
+<div id="view_others" title="Voir le MonLCS d'un autre utilisateur"></div>
+<div id="descr_popup"></div>
+<div id="div_acad_import"></div>
 
 </body>
 </html>

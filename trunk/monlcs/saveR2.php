@@ -1,8 +1,6 @@
 <?
 include "includes/secure_no_header.inc.php";
 
-if($_POST) {
-extract($_POST);
 
 
 //alimenter ml_ressourcesAffect 
@@ -25,11 +23,13 @@ $curseur=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
 			`cible` ,
 			`x` ,
 			`y` ,
+			`z` ,
 			`w` ,
-			`h`
+			`h` ,
+			`min` 
 			)
 			VALUES (
-			NULL ,'$uid', '$idTab', '$idR', '$cible','$x','$y','$w','$h'
+			NULL ,'$uid', '$idTab', '$idR', '$cible','$x','$y','$z','$w','$h','$min'
 			);";
 
 		$cIns = mysql_query($sql) or die("ERR $sql");
@@ -37,7 +37,6 @@ $curseur=mysql_query($sql) or die(stringForJavascript("ERR $sql"));
 
 		}
 	}//if curseur
-}
 
 ?>
 

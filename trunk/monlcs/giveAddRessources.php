@@ -105,10 +105,14 @@ if (isset($_POST['description']))
 <?php
 
 echo "<table><tr><td><div onclick=javascript:viewUrl2(); >$view_img</div></td><td><div onclick=javascript:addUrl(); >$add_img</div></td></tr></table>"
-."<B>Url: </B><input id=urlAdd name=urlAdd size=40 value=http://www.google.fr />"
-." <BR /><B>Titre: </B><input id=titreAdd name=titreAdd size=40 value=Mon_titre />"
-."<BR /><input type=checkbox id=statut  /> Rendre la ressource publique"
-."<BR /><input type=checkbox id=RSS  /> La ressource est un flux RSS"
+."<table>"
+."<tr><td><B>Url: </B></td><td><input id=urlAdd name=urlAdd size=40 value=http://www.google.fr /></td></tr>"
+." <tr><td><B>Titre: </B></td><td><input id=titreAdd name=titreAdd size=40 value=Mon_titre /></td></tr>"
+." <tr><td><B>Descr: </B></td><td><input id=descrAdd name=descrAdd size=40 value=Courte_Description /></td></tr>"
+."<tr><td colspan=2><input type=checkbox id=statut  onclick=javascript:checkStatus(); />&nbsp;Visible par tous (publique)</td></tr>"
+."<tr><td colspan=2><input type=checkbox id=statutP onclick=javascript:checkStatusP();  />&nbsp;Visible par profs/administratifs</td></tr>"
+."<tr><td colspan=2><input type=checkbox id=RSS  /> La ressource est un flux RSS</td></tr></table>"
+//."<tr><td colspan=2><input type=checkbox id=siteTV  /> La ressource est une vid&eacute;o siteTV <br /> &nbsp;(mettre le jeton de la vid&eacute;o dans la case URL<br />&nbsp; example: 0523.0026.00 )</td></tr></table>"
 ."<input type=\"hidden\" name=\"filename\" id=\"filename\">";
 ?>
 
